@@ -1,0 +1,41 @@
+## Kiến trúc Kênh và Quy ước Giao tiếp Bất đồng bộ (Slack / Lark)
+
+---
+
+## 1. Sơ đồ kiến trúc kênh (Channel Architecture)
+
+Hệ thống được chia làm 4 nhóm kênh riêng biệt nhằm triệt để phân loại luồng thông tin, giúp lập trình viên không bị xao nhãng bởi tin nhắn không liên quan:
+
+| Tên Channel | Chế độ (Privacy) | Mục đích & Quy định nội dung |
+| --- | --- | --- |
+| **`#00-announcement`** | Chỉ đọc *(Only Admins post)* | **Thông báo quan trọng:** Deadline, lịch họp, release bản mới. Nghiêm cấm chat tán gẫu; thành viên chỉ dùng emoji để thả thả tim/đã đọc. |
+| **`#01-tech-hardware`** | Công khai *(Public)* | **Kỹ thuật Cảm biến & Phần cứng:** Thảo luận mạch, kết nối IoT, dữ liệu cảm biến bãi đỗ xe. |
+| **`#02-tech-software`** | Công khai *(Public)* | **Phần mềm & API:** Thảo luận backend, frontend, thuật toán nhận diện biển số, tích hợp cơ sở dữ liệu. |
+| **`#03-general-discussion`** | Công khai *(Public)* | **Thảo luận chung:** Trả lời thắc mắc dự án, trao đổi công việc liên phòng ban chưa rõ thuộc channel nào. |
+| **`#99-random-coffee`** | Công khai *(Public)* | **Giải trí:** Gửi meme, chém gió, rủ đi cà phê. *Lưu ý: Mọi tin nhắn giải trí ở các kênh khác sẽ bị xóa mà không cần báo trước.* |
+
+---
+
+## 2. Bản quy ước giao tiếp: 3 Quy tắc vàng (Asynchronous Communication)
+
+Để bảo vệ khoảng thời gian tập trung cao độ (Deep Work) khi gõ code của lập trình viên và loại bỏ văn hóa "ép rep ngay lập tức":
+
+### 1. Cấm tuyệt đối "No-Hello Trap" (Nói thẳng vào vấn đề)
+
+* **Quy tắc:** Không gửi các tin nhắn lửng lơ như *"Chào anh"*, *"Bạn ơi rảnh không?"* rồi bắt đối phương chờ đợi.
+* **Cách làm đúng:** Viết toàn bộ ngữ cảnh + câu hỏi trong 1 tin nhắn duy nhất:
+> *"Chào Nam, cảm biến vị trí A2 đang gửi sai định dạng JSON (kèm log bên dưới). Nhờ Nam xem giúp khi rảnh nhé."*
+
+
+
+### 2. Sử dụng "Reply in Thread" cho mọi phản hồi
+
+* **Quy tắc:** Không nhắn trực tiếp vào khung chat chính khi trả lời một chủ đề đã có. Bắt buộc bấm **Reply in Thread** để gom toàn bộ luồng thảo luận vào một cây tin nhắn duy nhất.
+* **Tác dụng:** Giúp khung chat chính luôn gọn gàng, người vào sau không bị rối mắt và dễ dàng tra cứu lại lịch sử.
+
+### 3. Kiểm soát tag `@all` / `@channel` & Thiết lập tư duy Async
+
+* **Tôn trọng thời gian tập trung:** Mọi thắc mắc kỹ thuật mặc định là **Bất đồng bộ (Async)** — người nhận có thể trả lời sau 1–2 giờ khi xong phiên gõ code.
+* **Giới hạn thẻ tag:**
+* Chỉ dùng `@all` cho sự cố hạ tầng khẩn cấp (SOP Level 1) hoặc thông báo chót ở `#00-announcement`.
+* Nếu khẩn cấp thật sự: Gọi điện trực tiếp thay vì spam chat. Các tin nhắn tag vô tội vạ sẽ bị tắt thông báo (Mute).
